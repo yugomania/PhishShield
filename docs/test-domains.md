@@ -53,6 +53,7 @@ These sites are used to confirm there are no false positives. The extension must
    http://paypa1-secure.test/login
    ```
 5. ✅ **Expected:** Chrome immediately redirects the tab to the extension page `/blocked/blocked.html`. You should NOT see any content from the fake domain.
+   The warning page should display the matched domain and its rule-specific demo-pattern explanation.
 6. Repeat with at least two more entries from the Blocked Fake Domains table (e.g. `http://micros0ft-login.test` and `http://secure.login.verify.auth.steam-support.test`).
 
 ### B — Testing a Safe Control Site (No False Positive)

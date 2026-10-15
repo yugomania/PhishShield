@@ -16,7 +16,7 @@ async function applyProtection(enabled) {
         : { disableRulesetIds: [RULESET_ID] },
     );
 
-    if (enabled) await refreshFeed();
+    if (enabled) await refreshDueFeeds(true);
     else await clearFeedRules();
   } catch (err) {
     console.error("PhishShield: could not apply protection state", err);
@@ -52,12 +52,14 @@ chrome.storage.onChanged.addListener(async (changes, area) => {
 
 async function ensureFeedAlarm() {
   const alarm = await chrome.alarms.get("refresh-feed");
-  if (!alarm) chrome.alarms.create("refresh-feed", { periodInMinutes: 360 });
+  if (!alarm || alarm.periodInMinutes !== 5) {
+    chrome.alarms.create("refresh-feed", { periodInMinutes: 5 });
+  }
 }
 ensureFeedAlarm();
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name !== "refresh-feed") return;
   const { settings } = await chrome.storage.local.get("settings");
-  if (settings?.protectionEnabled ?? true) await refreshFeed();
+  if (settings?.protectionEnabled ?? true) await refreshDueFeeds();
 });

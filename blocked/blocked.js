@@ -44,15 +44,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function loadBlockDetails() {
     const params = new URLSearchParams(window.location.search);
-
     // Support the original URL passed to the blocked page.
     const queryUrl =
       params.get("url") ||
       params.get("blockedUrl") ||
       params.get("blocked_url");
+    const site = params.get("site");
 
     // Query-string values are display data, not proof of a real threat.
-    displayUrl(queryUrl);
+    displayUrl(queryUrl || (site ? `https://${site}/` : ""));
+
+    let eventDomain = "";
+    try {
+      const parsed = new URL(queryUrl || (site ? `https://${site}/` : ""));
+      if (
+        (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+        !parsed.username &&
+        !parsed.password
+      ) {
+        eventDomain = parsed.hostname;
+      }
+    } catch {
+      // No usable site was passed to the warning page.
+    }
+
+    if (
+      eventDomain &&
+      typeof PhishStore !== "undefined" &&
+      typeof PhishStore.addEvent === "function"
+    ) {
+      const reason = params.get("reason") || "The website matched a security rule.";
+      PhishStore.addEvent({
+        domain: eventDomain,
+        url: blockedUrl,
+        reason: reason.slice(0, 500),
+      }).catch((err) => {
+        console.error("PhishShield: could not record blocked-site event", err);
+      });
+    }
 
     const reason = params.get("reason");
     if (reason) {

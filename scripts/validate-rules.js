@@ -86,21 +86,39 @@ rules.forEach((rule, index) => {
     fail(`Rule id=${rule.id}: action.type must be "redirect", got ${JSON.stringify(rule.action?.type)}.`);
   }
 
-  // redirect.extensionPath must be exactly /blocked/blocked.html
-  const extensionPath = rule.action?.redirect?.extensionPath;
-  if (extensionPath !== REQUIRED_REDIRECT) {
-    fail(
-      `Rule id=${rule.id}: redirect.extensionPath must be exactly "${REQUIRED_REDIRECT}", got ${JSON.stringify(extensionPath)}.`
-    );
-  }
-
   // condition must exist and have urlFilter
   if (!rule.condition || typeof rule.condition.urlFilter !== "string") {
     fail(`Rule id=${rule.id}: condition.urlFilter must be a string.`);
   }
 
-  // urlFilter must be unique
   const filter = rule.condition.urlFilter;
+  const domain = domainFromFilter(filter);
+
+  // The warning page receives the matching domain and its demo explanation.
+  const extensionPath = rule.action?.redirect?.extensionPath;
+  let redirectUrl;
+  try {
+    redirectUrl = new URL(`chrome-extension://phishshield${extensionPath}`);
+  } catch {
+    fail(
+      `Rule id=${rule.id}: redirect.extensionPath is not a valid extension path: ${JSON.stringify(extensionPath)}.`
+    );
+  }
+  if (redirectUrl.pathname !== REQUIRED_REDIRECT) {
+    fail(
+      `Rule id=${rule.id}: redirect.extensionPath must target "${REQUIRED_REDIRECT}", got ${JSON.stringify(extensionPath)}.`
+    );
+  }
+  if (redirectUrl.searchParams.get("site") !== domain) {
+    fail(
+      `Rule id=${rule.id}: redirect must pass site=${domain}, got ${JSON.stringify(redirectUrl.searchParams.get("site"))}.`
+    );
+  }
+  if (!redirectUrl.searchParams.get("reason")?.trim()) {
+    fail(`Rule id=${rule.id}: redirect must pass a non-empty reason parameter.`);
+  }
+
+  // urlFilter must be unique
   if (seenFilters.has(filter)) {
     fail(`Duplicate urlFilter detected: "${filter}".`);
   }
@@ -119,7 +137,6 @@ rules.forEach((rule, index) => {
   }
 
   // domain must be under .test or .invalid
-  const domain = domainFromFilter(filter);
   if (!hasAllowedTld(domain)) {
     fail(
       `Rule id=${rule.id}: domain "${domain}" does not end with .test or .invalid. Only reserved TLDs are permitted.`

@@ -17,10 +17,10 @@ No build step, no `npm install`, no external services are required for the core 
 ## How it works
 
 - `manifest.json` registers a static rule list (`rules.json`) via `declarative_net_request`. These rules block 15 pre-configured fake phishing domains (all on reserved `.test` / `.invalid` TLDs — see `docs/test-domains.md`) by redirecting navigation to `blocked/blocked.html` before the page loads.
-- `background.js` is the service worker: it applies the saved protection ON/OFF setting, sets the toolbar badge, and (every 6 hours, plus on install) refreshes an additional *dynamic* rule set built from two live threat feeds (OpenPhish, CERT Polska) — see the note in [Known limitations](#known-limitations).
+- `background.js` is the service worker: it applies the saved protection ON/OFF setting, sets the toolbar badge, and schedules dynamic threat-feed refreshes.
 - `popup/` is the toolbar popup. Currently shows only a one-line protection status (`popup.css` already contains a fuller dashboard design that is not yet wired into `popup.html`).
-- `blocked/` is the warning page shown when a site is blocked.
-- `shared/storage.js` is a small wrapper around `chrome.storage.local` for settings and (planned) event history.
+- `blocked/` is the warning page shown when a site is blocked. Static and dynamic rules pass the blocked address and a source or demo-pattern reason to it, and it records blocked-site events through `shared/storage.js`.
+- `shared/storage.js` is a small wrapper around `chrome.storage.local` for settings and the 50 most recent blocked-site events.
 - `analyser/` is a standalone Python package (`url_risk_analyser`) that analyses a pasted URL for phishing risk indicators. It is **not yet connected** to the extension UI — see below.
 
 ## Running the test-domain checks
@@ -29,15 +29,17 @@ No build step, no `npm install`, no external services are required for the core 
 
 ```bash
 node scripts/validate-rules.js
+node scripts/feed.test.cjs
 ```
 
-This validates `rules.json` with no external dependencies — plain Node.js. It checks that every rule:
+The validator checks `rules.json` with no external dependencies — plain Node.js. It checks that every rule:
 - has a unique `id` and `urlFilter`,
-- redirects to exactly `/blocked/blocked.html`,
+- redirects to `/blocked/blocked.html` with a `site` query parameter matching the blocked domain,
 - targets `main_frame` only,
 - and only blocks domains under the reserved `.test` / `.invalid` TLDs (so a misconfigured rule can never accidentally target a real website).
 
 It exits with code `1` and a clear message on the first violation found, or prints `PASS` with a rule count when everything checks out.
+The feed fixture checks source-specific redirect details, refresh intervals, failure retention, and rule restoration without making network requests.
 
 ## Running the URL risk analyser (optional, standalone)
 
@@ -57,18 +59,18 @@ Requires Python 3.10+, standard library only. See `analyser/README.md` for the f
 | PRD feature | Status |
 | --- | --- |
 | F01 — Automatic website blocking | **Working.** 15 static test-domain rules block and redirect before page load. |
-| F02 — Security warning page | **Partially working.** The page displays, but the static rules don't currently pass the blocked URL/reason as query parameters, so it shows a generic message instead of the specific domain/reason. |
+| F02 — Security warning page | **Working.** Static and dynamic rules pass the blocked address and a source or demo-pattern reason to the warning page. |
 | F03 — Protection popup/dashboard | **Not yet built.** Popup only shows a protection ON/OFF status line. The dashboard layout exists in `popup/popup.css` but isn't wired into `popup.html` yet, and no event counts are shown. |
 | F04 — Manual URL risk analyser | **Backend only.** The Python analyser works standalone (CLI + local API) but has no UI in the extension yet. |
-| F05 — Security history | **Not yet built.** `shared/storage.js` has an `addEvent()` helper, but nothing currently calls it, so no events are recorded. |
+| F05 — Security history | **Partially working.** The warning page records blocked-site events locally; the popup does not yet show event history or counts. |
 
 Known open items are tracked as a checklist in the team's QA doc.
 
 ## Known limitations
 
-- The background service worker fetches two **live, real-world** phishing-domain feeds (OpenPhish, CERT Polska) on install and every 6 hours, in addition to the 15 static demo rules. This is a deliberate extra capability, but the team should confirm before the Friday demo whether it should be left on, since the PRD lists full external threat-intelligence integration as out of scope for this week.
-- If a feed fetch fails (e.g. no internet), the extension logs the error and keeps whatever dynamic rules it already had — it does **not** fall back to blocking nothing. The 15 static demo rules are unaffected either way, since they live in a separate, independent rule set.
-- Never collects passwords, OTPs, or page content. No full browsing history is ever sent anywhere. All settings and (future) event data stay in local extension storage only.
+- The background service worker checks the CERT Polska domain feed every 5 minutes and the OpenPhish URL feed every 12 hours, in addition to the 15 static demo rules.
+- If a feed fetch fails (e.g. no internet), the extension logs the error and keeps that source's last known-good snapshot and dynamic rules. The 15 static demo rules are unaffected because they use a separate rule set.
+- Never collects passwords, OTPs, or page content. No full browsing history is ever sent anywhere. Settings, feed snapshots, and blocked-site events stay in local extension storage only.
 
 ## Project structure
 
