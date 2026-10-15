@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "PhishShield",
+  "version": "1.0.0",
+  "description": "A simple phishing link checker.",
+  "action": {
+    "default_popup": "pop/popup.html"
+  }
+}
