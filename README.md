@@ -18,7 +18,7 @@ No build step, no `npm install`, no external services are required for the core 
 
 - `manifest.json` registers a static rule list (`rules.json`) via `declarative_net_request`. These rules block 15 pre-configured fake phishing domains (all on reserved `.test` / `.invalid` TLDs — see `docs/test-domains.md`) by redirecting navigation to `blocked/blocked.html` before the page loads.
 - `background.js` is the service worker: it applies the saved protection ON/OFF setting, sets the toolbar badge, and schedules dynamic threat-feed refreshes.
-- `popup/` is the toolbar popup. Currently shows only a one-line protection status (`popup.css` already contains a fuller dashboard design that is not yet wired into `popup.html`).
+- `popup/` is the toolbar dashboard. It shows protection state and controls, the active tab hostname, feed status, and recent blocked-site history. The popup does not run URL analysis.
 - `blocked/` is the warning page shown when a site is blocked. Static and dynamic rules pass the blocked address and a source or demo-pattern reason to it, and it records blocked-site events through `shared/storage.js`.
 - `shared/storage.js` is a small wrapper around `chrome.storage.local` for settings and the 50 most recent blocked-site events.
 - `analyser/` is a Python package (`url_risk_analyser`) that analyses pasted URLs. Its local API is called by the warning page's **Analyse this URL** control; start it with `python -m url_risk_analyser --serve` from `analyser/`.
@@ -60,9 +60,9 @@ Requires Python 3.10+, standard library only. Start the API before using **Analy
 | --- | --- |
 | F01 — Automatic website blocking | **Working.** 15 static test-domain rules block and redirect before page load. |
 | F02 — Security warning page | **Working.** Static and dynamic rules pass the blocked address and a source or demo-pattern reason to the warning page. |
-| F03 — Protection popup/dashboard | **Not yet built.** Popup only shows a protection ON/OFF status line. The dashboard layout exists in `popup/popup.css` but isn't wired into `popup.html` yet, and no event counts are shown. |
+| F03 — Protection popup/dashboard | **Working.** The popup shows protection state with an ON/OFF toggle, the active tab hostname, feed status, and stored event counts. |
 | F04 — Manual URL risk analyser | **Partially integrated.** The warning page lets users enter a URL and view the local analyser report. The popup has no analyser UI. |
-| F05 — Security history | **Partially working.** The warning page records blocked-site events locally; the popup does not yet show event history or counts. |
+| F05 — Security history | **Working.** The warning page records events locally, and the popup displays up to five recent events from the 50-entry local history, including the recorded reason and time. |
 
 Current manual QA steps are documented in [test-domains.md](docs/test-domains.md), [test-cases.md](docs/test-cases.md), and [demo-script.md](docs/demo-script.md).
 
@@ -81,7 +81,7 @@ PhishShield/
 ├── rules.json                 Static declarativeNetRequest rules (15 demo domains)
 ├── blocking/feed.js           Builds dynamic rules from live threat feeds
 ├── shared/storage.js          chrome.storage.local wrapper (settings, events)
-├── popup/                     Toolbar popup (status display)
+├── popup/                     Toolbar protection and history dashboard
 ├── blocked/                   Warning page shown on a blocked navigation
 ├── scripts/validate-rules.js  Standalone validator for rules.json
 ├── docs/test-domains.md       Manual QA test plan and domain reference

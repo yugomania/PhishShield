@@ -3,12 +3,28 @@ importScripts("blocking/feed.js");
 const RULESET_ID = "ruleset_1";
 
 // Apply the saved ON/OFF state to Chrome and show it on the toolbar badge
+const PROTECTION_ICONS = {
+  on: {
+    16: "icons/phishshield-on-16.png",
+    32: "icons/phishshield-on-32.png",
+  },
+  off: {
+    16: "icons/phishshield-off-16.png",
+    32: "icons/phishshield-off-32.png",
+  },
+};
+
 async function applyProtection(enabled) {
   try {
-    await chrome.action.setBadgeText({ text: enabled ? "ON" : "OFF" });
-    await chrome.action.setBadgeBackgroundColor({
-      color: enabled ? "#15803d" : "#b91c1c",
+    await chrome.action.setIcon({
+      path: enabled ? PROTECTION_ICONS.on : PROTECTION_ICONS.off,
     });
+
+    // Clear the ON/OFF text badge.
+    await chrome.action.setBadgeText({ text: "" });
+    // await chrome.action.setBadgeBackgroundColor({
+    //   color: enabled ? "#15803d" : "#b91c1c",
+    // });
 
     await chrome.declarativeNetRequest.updateEnabledRulesets(
       enabled
