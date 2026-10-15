@@ -543,3 +543,79 @@ body::-webkit-scrollbar-thumb {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Popup MVP: protection status and URL scan form */
+body { min-height: 0; }
+.popup-app { min-height: 0; }
+.popup-topbar { margin-bottom: 22px; }
+.popup-welcome { margin-bottom: 18px; }
+.popup-welcome h1 { font-size: 27px; }
+.popup-protection { padding-top: 16px; }
+.popup-protection h2 { font-size: 17px; }
+.popup-protection > p { margin-bottom: 14px; }
+.scan-section { margin-top: 20px; }
+.scan-section .section-heading { margin-bottom: 10px; }
+.scan-section label {
+    display: block;
+    margin-bottom: 6px;
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 600;
+}
+.scan-section input {
+    width: 100%;
+    min-height: 40px;
+    padding: 10px 11px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 10px;
+    font: inherit;
+}
+.scan-section input::placeholder { color: #64748b; }
+.scan-section input:focus-visible { border-color: var(--green); }
+.scan-section button {
+    width: 100%;
+    min-height: 39px;
+    margin-top: 9px;
+    color: #062116;
+    background: var(--green);
+    border: 0;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.scan-section button:hover { filter: brightness(1.06); }
+.scan-section button:disabled { cursor: wait; opacity: 0.7; }
+.scan-result {
+    margin-top: 12px;
+    padding: 12px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 11px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+.scan-result h3 { margin-bottom: 5px; font-size: 13px; font-weight: 700; }
+.scan-result p { margin: 0; }
+.scan-result .result-details,
+.scan-result .result-disclaimer,
+.analyser-note {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 9px;
+}
+.scan-result.warning { border-color: rgba(255, 184, 107, 0.42); }
+.scan-result.demo { border-color: rgba(96, 165, 250, 0.42); }
+.scan-result.safe { border-color: rgba(66, 230, 164, 0.35); }
+.finding-list { margin: 8px 0 0; padding-left: 16px; }
+.finding-list li + li { margin-top: 5px; }
+.analyser-note { line-height: 1.5; }
+.popup-footer { margin-top: 15px; padding-top: 10px; }
+@media (max-height: 650px) {
+    body { max-height: 600px; overflow-y: auto; }
+}
+

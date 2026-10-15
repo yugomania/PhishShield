@@ -7,9 +7,56 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <main>
-      <h1>PhishShield</h1>
-      <p id="status">Loading...</p>
+    <main class="app popup-app">
+      <header class="topbar popup-topbar">
+        <a class="brand" href="#" aria-label="PhishShield home">
+          <span class="brand-icon" aria-hidden="true">P</span>
+          <span class="brand-name">Phish<span>Shield</span></span>
+        </a>
+        <div id="protection-pill" class="connection-status" role="status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="status">Loading</span>
+        </div>
+      </header>
+
+      <section class="welcome popup-welcome">
+        <span class="eyebrow">BROWSE WITH CARE</span>
+        <h1>Check a <span>link</span></h1>
+        <p>Review a website address for known threats and common phishing warning signs.</p>
+      </section>
+
+      <section class="protection-card popup-protection" aria-labelledby="protection-title">
+        <span class="protection-glow" aria-hidden="true"></span>
+        <span class="protection-label">LIVE PROTECTION</span>
+        <h2 id="protection-title">Your protection is <span id="protection-value">loading</span></h2>
+        <p>PhishShield can block configured phishing destinations while you browse.</p>
+        <div class="protection-footer">
+          <span>Blocked sites recorded</span>
+          <span id="history-count" class="live-label">0</span>
+        </div>
+      </section>
+
+      <section class="section scan-section" aria-labelledby="scan-heading">
+        <div class="section-heading">
+          <h2 id="scan-heading">Scan a website address</h2>
+          <span class="muted-label">PRIVATE CHECK</span>
+        </div>
+        <form id="scan-form">
+          <label for="url-input">Website address</label>
+          <input id="url-input" name="url" type="text"
+            placeholder="example.com or https://example.com"
+            autocomplete="url" spellcheck="false" required />
+          <button id="scan-button" type="submit">Check link</button>
+        </form>
+        <div id="scan-result" class="scan-result" aria-live="polite" aria-atomic="true">
+          <p class="result-placeholder">Enter a link above to see the analysis.</p>
+        </div>
+        <p class="analyser-note">Analysis uses the project's local URL analyser. Heuristic warnings are not proof that a site is malicious.</p>
+      </section>
+
+      <footer class="footer popup-footer">
+        <span class="footer-brand">PhishShield <span>•</span> Stay alert online</span>
+      </footer>
     </main>
     <script src="../shared/storage.js"></script>
     <script src="popup.js"></script>
