@@ -1,5 +1,5 @@
 // OpenPhish publishes URL indicators; CERT Polska publishes active domains.
-// The scheduler checks CERT every 5 minutes and OpenPhish every 12 hours.
+// The scheduler checks CERT every 60 minutes and OpenPhish every 12 hours.
 const FEEDS = [
   {
     id: "openphish",
@@ -13,7 +13,7 @@ const FEEDS = [
     id: "certPolska",
     name: "CERT Polska",
     url: "https://hole.cert.pl/domains/v2/domains.txt",
-    intervalMs: 5 * 60 * 1000,
+    intervalMs: 60 * 60 * 1000,
     reason: "This domain appears on the CERT Polska warning list.",
     parse: parseDomainFeed,
   },

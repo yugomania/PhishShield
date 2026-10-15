@@ -11,6 +11,7 @@ HEURISTIC_DISCLAIMER = (
     "that this URL is malicious, and legitimate sites can trigger them. An empty list does not "
     "prove a URL is safe."
 )
+DEMO_RULE_SOURCE = "PhishShield demo rules"
 
 _default_sources: list[IntelSource] | None = None
 
@@ -38,6 +39,9 @@ def analyse(raw_url: str, sources: list[IntelSource] | None = None) -> dict:
         "threat_intelligence": {
             **intel.to_dict(),
             "meaning": (
+                "Matched PhishShield's reserved test-domain demo rules. This is a test indicator, "
+                "not evidence that a live site is malicious."
+                if intel.matches and all(match.source == DEMO_RULE_SOURCE for match in intel.matches) else
                 "Confirmed: listed by a threat-intelligence source as a known malicious destination."
                 if intel.matches else
                 "Not on any list checked. Lists only contain threats already reported, so new "
@@ -57,6 +61,15 @@ def analyse(raw_url: str, sources: list[IntelSource] | None = None) -> dict:
 def _verdict(intel, findings, risk_level: str) -> dict:
     if intel.matches:
         sources = sorted({m.source for m in intel.matches})
+        if all(match.source == DEMO_RULE_SOURCE for match in intel.matches):
+            return {
+                "category": "demo_rule_match",
+                "label": "Demo rule match",
+                "summary": (
+                    "This reserved test domain matched a PhishShield demo rule. "
+                    "It is not a confirmed live phishing site."
+                ),
+            }
         return {
             "category": "confirmed_malicious",
             "label": "Confirmed malicious",

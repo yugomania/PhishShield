@@ -9,6 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const copyButton = document.getElementById("copy-url");
   const backButton = document.getElementById("go-back");
   const closeButton = document.getElementById("close-tab");
+  const analyseButton = document.getElementById("analyse-url");
+  const urlInput = document.getElementById("url-input");
+  const analysisResult = document.getElementById("analysis-result");
 
   let blockedUrl = "";
   let returnUrl = "";
@@ -36,6 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     urlElement.textContent = blockedUrl || "Website address unavailable";
     copyButton.disabled = !blockedUrl;
+    if (blockedUrl && !urlInput.value.trim()) {
+      urlInput.value = blockedUrl;
+    }
   }
 
   function showNotice(message) {
@@ -178,4 +184,83 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   loadBlockDetails();
+
+  function formatAnalysisReport(report) {
+    const verdict = report.verdict;
+    const intel = report.threat_intelligence;
+    const heuristics = report.heuristics;
+
+    const lines = [
+      `Verdict: ${verdict.label}`,
+      verdict.summary,
+      "",
+      `Threat intelligence: ${
+        intel.matches.length
+          ? intel.matches
+              .map((match) => `${match.source}: ${match.detail}`)
+              .join("\n")
+          : "No threat-intelligence match."
+      }`,
+      "",
+      `Heuristic risk: ${heuristics.risk_score}/100 (${heuristics.risk_level})`,
+    ];
+
+    if (heuristics.findings.length) {
+      lines.push(
+        "",
+        ...heuristics.findings.map(
+          (finding) => `• ${finding.title}: ${finding.explanation}`,
+        ),
+      );
+    } else {
+      lines.push("No heuristic warning signs were found.");
+    }
+
+    if (intel.errors.length) {
+      lines.push("", `Source errors: ${intel.errors.join("; ")}`);
+    }
+
+    return lines.join("\n");
+  }
+
+  async function analyseBlockedUrl() {
+    const urlToAnalyse = getSafeUrl(urlInput.value);
+    if (!urlToAnalyse) {
+      analysisResult.hidden = false;
+      analysisResult.textContent = "Enter a valid HTTP or HTTPS URL to analyse.";
+      return;
+    }
+
+    analyseButton.disabled = true;
+    analyseButton.textContent = "Analysing…";
+    analysisResult.hidden = false;
+    analysisResult.textContent = "Checking the URL…";
+
+    try {
+      const response = await fetch("http://127.0.0.1:8765/analyse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: urlToAnalyse }),
+      });
+
+      const report = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          report.error || `Analysis failed (${response.status}).`,
+        );
+      }
+
+      analysisResult.textContent = formatAnalysisReport(report);
+    } catch (error) {
+      analysisResult.textContent =
+        `Could not reach the analyser. Make sure its local service is running. ` +
+        `${error.message}`;
+    } finally {
+      analyseButton.disabled = false;
+      analyseButton.textContent = "Analyse this URL";
+    }
+  }
+
+  analyseButton.addEventListener("click", analyseBlockedUrl);
 });

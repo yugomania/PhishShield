@@ -20,7 +20,6 @@ python -m url_risk_analyser      # same thing without installing (prompts for a 
 url-risk --json <url>            # machine-readable output
 url-risk --update-feed           # download the latest OpenPhish feed (run daily via cron)
 url-risk --serve                 # local API for the extension on http://127.0.0.1:8765
-python -m unittest discover -s tests
 ```
 
 ## Verdict categories
@@ -28,6 +27,7 @@ python -m unittest discover -s tests
 | `verdict.category` | Meaning |
 |---|---|
 | `confirmed_malicious` | Matched a threat-intelligence source |
+| `demo_rule_match` | Matched a reserved test-domain rule; not evidence of a live threat |
 | `suspicious` | No match, but medium or high heuristic risk. Not confirmed |
 | `low_risk_indicators` | No match, with only weak warning signs |
 | `no_indicators` | No match and no warning signs. This is **not** a guarantee of safety |
@@ -45,7 +45,7 @@ The analyser parses URLs **the way a browser does**. For example, it treats `\` 
 
 ## Threat-intelligence sources
 
-* `url_risk_analyser/data/blocklist.txt` is a list the team maintains by hand. A bare domain blocks that domain and all its subdomains. A full URL blocks only that page, because many phishing pages sit on legitimate platforms.
+* `url_risk_analyser/data/blocklist.txt` contains the extension's reserved `.test` and `.invalid` demo indicators, generated from `rules.json`. These entries exercise local-list matching; they are not reports of live malicious sites. A bare domain matches that domain and its subdomains. A full URL matches only that page.
 * `url_risk_analyser/data/openphish.txt` comes from the [OpenPhish community feed](https://openphish.com/) via `--update-feed`.
 * Google Safe Browsing is used if the `GSB_API_KEY` environment variable is set. Google's terms allow non-commercial use only.
 
@@ -53,7 +53,7 @@ You can add another source, such as URLhaus or PhishTank, by writing a class wit
 
 ## Integration with the extension
 
-Run `url-risk --serve`, then call it from the extension:
+Run `url-risk --serve`, then use **Analyse this URL** on the extension's warning page. The page sends the entered URL to the local API:
 
 ```js
 const res = await fetch("http://127.0.0.1:8765/analyse", {
@@ -65,7 +65,7 @@ const report = await res.json();
 // report.verdict.category, report.threat_intelligence.matches, report.heuristics.findings[]
 ```
 
-Add `"host_permissions": ["http://127.0.0.1:8765/*"]` to `manifest.json`. `GET /health` lists the active sources. Errors return `400` for a bad request body and `422` for an unparseable URL.
+The extension manifest must grant host access to `http://127.0.0.1:8765/*`; this project currently grants the broader `<all_urls>` permission. `GET /health` lists the active sources. Errors return `400` for a bad request body and `422` for an unparseable URL.
 
 ## Limitations
 

@@ -1,84 +1,113 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080d18">
-  <title>Website Blocked | PhishShield</title>
-  <link rel="stylesheet" href="blocked.css">
-  <script src="../shared/storage.js" defer></script>
-  <script src="blocked.js" defer></script>
-</head>
-<body>
-  <main class="page">
-    <header class="brand">
-      <div class="brand-icon" aria-hidden="true">P</div>
-      <div>
-        <h1>PhishShield</h1>
-        <p>Browser Protection</p>
-      </div>
-      <span class="status"><span></span> Protection active</span>
-    </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080d18" />
+    <title>Website Blocked | PhishShield</title>
+    <link rel="stylesheet" href="blocked.css" />
+    <script src="../shared/storage.js" defer></script>
+    <script src="blocked.js" defer></script>
+  </head>
+  <body>
+    <main class="page">
+      <header class="brand">
+        <div class="brand-icon" aria-hidden="true">P</div>
+        <div>
+          <h1>PhishShield</h1>
+          <p>Browser Protection</p>
+        </div>
+        <span class="status"><span></span> Protection active</span>
+      </header>
 
-    <section class="warning-card" aria-labelledby="warning-title">
-      <div class="warning-symbol" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <path d="M32 6 57 51H7L32 6Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
-          <path d="M32 23V35" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="32" cy="43" r="2.5" fill="currentColor"/>
-        </svg>
-      </div>
-
-      <p class="eyebrow">SECURITY ALERT</p>
-      <h2 id="warning-title">This website has been blocked</h2>
-      <p class="description">
-        PhishShield detected a potential security threat.
-        Access to this website has been stopped to help protect
-        your personal information.
-      </p>
-
-      <div class="risk-panel">
-        <div class="risk-heading">
-          <span>Threat assessment</span>
-          <span class="risk-badge" id="risk-level">Potential threat</span>
+      <section class="warning-card" aria-labelledby="warning-title">
+        <div class="warning-symbol" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
+            <path
+              d="M32 6 57 51H7L32 6Z"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M32 23V35"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+            <circle cx="32" cy="43" r="2.5" fill="currentColor" />
+          </svg>
         </div>
 
-        <div class="url-label">Blocked website</div>
-        <div class="url-box">
-          <span id="blocked-url">Loading website address...</span>
-          <button id="copy-url" class="copy-button" type="button">
-            Copy
+        <p class="eyebrow">SECURITY ALERT</p>
+        <h2 id="warning-title">This website has been blocked</h2>
+        <p class="description">
+          PhishShield detected a potential security threat. Access to this
+          website has been stopped to help protect your personal information.
+        </p>
+
+        <div class="risk-panel">
+          <div class="risk-heading">
+            <span>Threat assessment</span>
+            <span class="risk-badge" id="risk-level">Potential threat</span>
+          </div>
+
+          <div class="url-label">Blocked website</div>
+          <div class="url-box">
+            <span id="blocked-url">Loading website address...</span>
+            <button id="copy-url" class="copy-button" type="button">
+              Copy
+            </button>
+          </div>
+
+          <div class="reason-heading">Why was this website blocked?</div>
+          <p id="block-reason" class="reason">
+            The website matched a security rule.
+          </p>
+
+          <div class="analyse-url">
+            <input
+              type="text"
+              id="url-input"
+              class="input-url"
+              placeholder="Enter URL to analyse"
+              aria-label="URL to analyse"
+            />
+            <button id="analyse-url" class="secondary-button" type="button">
+              Analyse this URL
+            </button>
+
+            <pre
+              id="analysis-result"
+              class="analysis-result"
+              role="status"
+              aria-live="polite"
+              hidden
+            ></pre>
+          </div>
+        </div>
+
+        <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+        <div class="actions">
+          <button id="go-back" class="primary-button" type="button">
+            Return to safety
+          </button>
+          <button id="close-tab" class="secondary-button" type="button">
+            Close this tab
           </button>
         </div>
 
-        <div class="reason-heading">Why was this website blocked?</div>
-        <p id="block-reason" class="reason">
-          The website matched a security rule.
+        <p class="safety-note">
+          Do not enter passwords, payment details, or verification codes on a
+          website you suspect is malicious.
         </p>
-      </div>
+      </section>
 
-      <div id="notice" class="notice" role="status" aria-live="polite"></div>
-
-      <div class="actions">
-        <button id="go-back" class="primary-button" type="button">
-          Return to safety
-        </button>
-        <button id="close-tab" class="secondary-button" type="button">
-          Close this tab
-        </button>
-      </div>
-
-      <p class="safety-note">
-        Do not enter passwords, payment details, or verification codes
-        on a website you suspect is malicious.
-      </p>
-    </section>
-
-    <footer>
-      <p>Protected by <strong>PhishShield</strong></p>
-      <p class="footer-note">Stay alert. Browse safely.</p>
-    </footer>
-  </main>
-</body>
+      <footer>
+        <p>Protected by <strong>PhishShield</strong></p>
+        <p class="footer-note">Stay alert. Browse safely.</p>
+      </footer>
+    </main>
+  </body>
 </html>

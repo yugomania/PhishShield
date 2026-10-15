@@ -45,6 +45,15 @@ const PhishStore = {
       record.reason = details.reason.slice(0, 500);
     }
 
+    const last = events[0];
+    if (
+      last &&
+      last.domain === record.domain &&
+      record.timestamp - last.timestamp < 10_000
+    ) {
+      return;
+    }
+
     events.unshift(record);
     await chrome.storage.local.set({ events: events.slice(0, 50) });
   },

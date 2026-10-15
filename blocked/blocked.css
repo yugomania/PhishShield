@@ -294,6 +294,49 @@ footer strong {
   font-size: 11px;
 }
 
+.analysis-result {
+  margin: 12px 0 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.analyse-url {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.input-url {
+  width: 100%;
+  min-height: 46px;
+  min-width: 0;
+  padding: 11px 13px;
+  border: 1px solid #354257;
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.input-url::placeholder {
+  color: var(--muted);
+}
+
+.input-url:focus-visible {
+  border-color: #93c5fd;
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
 @media (max-width: 480px) {
   .page {
     width: min(100% - 20px, 760px);

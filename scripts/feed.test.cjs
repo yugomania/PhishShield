@@ -119,6 +119,10 @@ test("feeds refresh on independent intervals and retain good snapshots on failur
   assert.equal(harness.calls.length, 2);
 
   harness.advance(5 * 60 * 1000);
+  await harness.refresh();
+  assert.deepEqual(harness.calls, [openPhish.url, certPolska.url]);
+
+  harness.advance(55 * 60 * 1000);
   harness.responses.set(certPolska.url, new Error("temporary outage"));
   await harness.refresh();
   assert.deepEqual(harness.calls, [openPhish.url, certPolska.url, certPolska.url]);
@@ -126,7 +130,7 @@ test("feeds refresh on independent intervals and retain good snapshots on failur
   assert.equal(harness.localData.feedSnapshots.certPolska.length, 1);
   assert.equal(harness.localData.feedSourcesStatus.certPolska.ok, false);
 
-  harness.advance(12 * 60 * 60 * 1000);
+  harness.advance(11 * 60 * 60 * 1000);
   harness.responses.set(openPhish.url, new Error("temporary outage"));
   harness.responses.set(certPolska.url, "new-warning.example\n");
   await harness.refresh();

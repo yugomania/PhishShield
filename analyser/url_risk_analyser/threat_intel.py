@@ -111,7 +111,12 @@ class LocalBlocklist:
         for i in range(len(labels) - 1):  # host and each parent domain, never a bare TLD
             candidate = ".".join(labels[i:])
             if candidate in self.domains:
-                return [IntelMatch(self.name, candidate, "Domain is listed as malicious")]
+                detail = (
+                    "Domain matches a reserved test-domain demo rule"
+                    if self.name == "PhishShield demo rules"
+                    else "Domain is listed as malicious"
+                )
+                return [IntelMatch(self.name, candidate, detail)]
         return []
 
 
@@ -150,7 +155,10 @@ class GoogleSafeBrowsing:
 
 
 def default_sources(blocklist_path: str | Path | None = None) -> list[IntelSource]:
-    sources: list[IntelSource] = [LocalBlocklist.from_file(blocklist_path or DEFAULT_BLOCKLIST)]
+    local_name = "Local blocklist" if blocklist_path else "PhishShield demo rules"
+    sources: list[IntelSource] = [
+        LocalBlocklist.from_file(blocklist_path or DEFAULT_BLOCKLIST, local_name)
+    ]
     if DEFAULT_FEED.exists():
         sources.append(LocalBlocklist.from_file(DEFAULT_FEED, "OpenPhish feed"))
     if key := os.environ.get("GSB_API_KEY"):
