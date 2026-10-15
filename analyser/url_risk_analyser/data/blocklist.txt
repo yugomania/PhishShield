@@ -1,0 +1,16 @@
+# Generated from rules.json. Reserved demo indicators only; not live threat intelligence.
+paypa1-secure.test
+micros0ft-login.test
+goog1e-verify.test
+secure.account-confirm.login.bankofamerica-update.test
+signin.verify.update.appleid-support.test
+amaz0n-order-confirm.test
+netfl1x-billing-update.test
+login.secure-chase-alert.test
+dropb0x-fileshare-login.test
+instagram-password-reset-verify.invalid
+wellsfarg0-secure-signin.invalid
+update.account.linked1n-verify.test
+ebay-account-suspended-action.invalid
+tw1tter-security-alert.test
+secure.login.verify.auth.steam-support.test

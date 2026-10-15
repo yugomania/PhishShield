@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "url-risk-analyser"
+version = "1.0.0"
+description = "Explainable phishing-risk analysis for URLs: confirmed threat-intel matches vs heuristic risk indicators"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+psl = ["tldextract>=5"]  # more accurate owner-domain detection via the Public Suffix List
+
+[project.scripts]
+url-risk = "url_risk_analyser.cli:main"
+
+[tool.setuptools]
+packages = ["url_risk_analyser"]
+
+[tool.setuptools.package-data]
+url_risk_analyser = ["data/*.txt"]

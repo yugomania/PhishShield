@@ -1,0 +1,242 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=paypa1-secure.test&reason=Demo%20pattern%3A%20a%20digit%20replaces%20a%20letter%20in%20a%20PayPal-like%20domain."
+      }
+    },
+    "condition": {
+      "urlFilter": "||paypa1-secure.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=micros0ft-login.test&reason=Demo%20pattern%3A%20a%20digit%20replaces%20a%20letter%20in%20a%20Microsoft-like%20domain."
+      }
+    },
+    "condition": {
+      "urlFilter": "||micros0ft-login.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=goog1e-verify.test&reason=Demo%20pattern%3A%20a%20digit%20replaces%20a%20letter%20in%20a%20Google-like%20domain."
+      }
+    },
+    "condition": {
+      "urlFilter": "||goog1e-verify.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=secure.account-confirm.login.bankofamerica-update.test&reason=Demo%20pattern%3A%20stacked%20subdomains%20imitate%20a%20Bank%20of%20America%20sign-in."
+      }
+    },
+    "condition": {
+      "urlFilter": "||secure.account-confirm.login.bankofamerica-update.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=signin.verify.update.appleid-support.test&reason=Demo%20pattern%3A%20stacked%20subdomains%20imitate%20an%20Apple%20ID%20sign-in."
+      }
+    },
+    "condition": {
+      "urlFilter": "||signin.verify.update.appleid-support.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=amaz0n-order-confirm.test&reason=Demo%20pattern%3A%20an%20Amazon-like%20name%20combines%20a%20digit%20swap%20with%20an%20order-confirmation%20lure."
+      }
+    },
+    "condition": {
+      "urlFilter": "||amaz0n-order-confirm.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=netfl1x-billing-update.test&reason=Demo%20pattern%3A%20a%20Netflix-like%20name%20combines%20a%20digit%20swap%20with%20a%20billing%20lure."
+      }
+    },
+    "condition": {
+      "urlFilter": "||netfl1x-billing-update.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=login.secure-chase-alert.test&reason=Demo%20pattern%3A%20a%20Chase-like%20domain%20uses%20login%20and%20security-alert%20wording."
+      }
+    },
+    "condition": {
+      "urlFilter": "||login.secure-chase-alert.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=dropb0x-fileshare-login.test&reason=Demo%20pattern%3A%20a%20Dropbox-like%20name%20combines%20a%20digit%20swap%20with%20file-sharing%20and%20login%20wording."
+      }
+    },
+    "condition": {
+      "urlFilter": "||dropb0x-fileshare-login.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=instagram-password-reset-verify.invalid&reason=Demo%20pattern%3A%20an%20Instagram-like%20name%20uses%20a%20password-reset%20verification%20lure."
+      }
+    },
+    "condition": {
+      "urlFilter": "||instagram-password-reset-verify.invalid",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 11,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=wellsfarg0-secure-signin.invalid&reason=Demo%20pattern%3A%20a%20Wells%20Fargo-like%20name%20combines%20a%20digit%20swap%20with%20secure%20sign-in%20wording."
+      }
+    },
+    "condition": {
+      "urlFilter": "||wellsfarg0-secure-signin.invalid",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=update.account.linked1n-verify.test&reason=Demo%20pattern%3A%20a%20LinkedIn-like%20name%20combines%20a%20digit%20swap%20with%20stacked%20account-update%20labels."
+      }
+    },
+    "condition": {
+      "urlFilter": "||update.account.linked1n-verify.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 13,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=ebay-account-suspended-action.invalid&reason=Demo%20pattern%3A%20an%20eBay-like%20name%20uses%20an%20account-suspension%20urgency%20lure."
+      }
+    },
+    "condition": {
+      "urlFilter": "||ebay-account-suspended-action.invalid",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 14,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=tw1tter-security-alert.test&reason=Demo%20pattern%3A%20a%20Twitter-like%20name%20combines%20a%20digit%20swap%20with%20a%20security%20alert."
+      }
+    },
+    "condition": {
+      "urlFilter": "||tw1tter-security-alert.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 15,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked/blocked.html?site=secure.login.verify.auth.steam-support.test&reason=Demo%20pattern%3A%20stacked%20subdomains%20imitate%20Steam%20authentication%20and%20support."
+      }
+    },
+    "condition": {
+      "urlFilter": "||secure.login.verify.auth.steam-support.test",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  }
+]

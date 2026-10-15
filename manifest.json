@@ -1,9 +1,42 @@
 {
   "manifest_version": 3,
   "name": "PhishShield",
-  "version": "1.0.0",
-  "description": "A simple phishing link checker.",
+  "version": "0.1.0",
+  "description": "An extra protection layer that blocks configured phishing test domains.",
+  "permissions": [
+    "declarativeNetRequest",
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "blocked/blocked.html",
+        "blocked/blocked.css",
+        "blocked/blocked.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
   "action": {
-    "default_popup": "pop/popup.html"
+    "default_title": "PhishShield",
+    "default_popup": "popup/popup.html"
   }
 }
