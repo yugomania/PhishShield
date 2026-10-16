@@ -587,6 +587,137 @@ body {
     text-align: center;
 }
 
+/* Manual URL analyser */
+
+.analyser-section {
+    padding: 15px;
+    background: linear-gradient(145deg, rgba(21, 31, 49, 0.86), rgba(16, 24, 39, 0.86));
+    border: 1px solid var(--border);
+    border-radius: 15px;
+}
+
+.analyser-section .section-heading {
+    margin-bottom: 11px;
+}
+
+.analyser-form {
+    display: grid;
+    gap: 7px;
+}
+
+.analyser-label {
+    color: #cbd5e1;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.analyser-input-row {
+    display: flex;
+    min-width: 0;
+    gap: 8px;
+}
+
+.analyser-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    flex: 1;
+    padding: 8px 10px;
+    color: var(--text);
+    background: #0b1220;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 9px;
+    font: inherit;
+    font-size: 10px;
+}
+
+.analyser-input::placeholder {
+    color: #64748b;
+}
+
+.analyser-input:focus-visible {
+    border-color: var(--blue);
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+}
+
+.analyser-button {
+    min-height: 38px;
+    flex-shrink: 0;
+    padding: 8px 11px;
+    color: #07101c;
+    background: var(--blue);
+    border: 1px solid rgba(96, 165, 250, 0.45);
+    border-radius: 9px;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 160ms ease, opacity 160ms ease;
+}
+
+.analyser-button:hover:not(:disabled) {
+    background: #93c5fd;
+}
+
+.analyser-button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+.analyser-help {
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.65;
+}
+
+.analyser-help code {
+    color: #b6c5da;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 8px;
+    overflow-wrap: anywhere;
+}
+
+.analyser-status {
+    display: none;
+    margin-top: 10px;
+    color: #bfdbfe;
+    font-size: 10px;
+    overflow-wrap: anywhere;
+}
+
+.analyser-status:not(:empty) {
+    display: block;
+}
+
+.analyser-status.is-error {
+    color: #fecaca;
+}
+
+.analyser-status.is-success {
+    color: #a7f3d0;
+}
+
+.analyser-result {
+    max-height: 300px;
+    overflow: auto;
+    margin-top: 10px;
+    padding: 12px;
+    color: #dbeafe;
+    background: #080d18;
+    border: 1px solid rgba(96, 165, 250, 0.16);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 10px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.analyser-result[hidden] {
+    display: none;
+}
+
 /* Security tip */
 
 .tips-card {

@@ -32,6 +32,17 @@ button {
   font: inherit;
 }
 
+.logo{
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: #15243a;
+  color: #93c5fd;
+  font-size: 20px;
+}
+
 .page {
   width: min(100% - 32px, 760px);
   margin: 0 auto;

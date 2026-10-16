@@ -217,6 +217,43 @@
         </div>
       </section>
 
+      <section class="section analyser-section" aria-labelledby="analyser-title">
+        <div class="section-heading">
+          <h2 id="analyser-title">Analyse a URL</h2>
+          <span class="muted-label">LOCAL ANALYSER</span>
+        </div>
+
+        <form class="analyser-form" id="analyser-form" novalidate>
+          <label class="analyser-label" for="analyser-url">URL to analyse</label>
+          <div class="analyser-input-row">
+            <input
+              class="analyser-input"
+              id="analyser-url"
+              name="url"
+              type="url"
+              inputmode="url"
+              autocomplete="url"
+              spellcheck="false"
+              placeholder="https://example.com/"
+              aria-describedby="analyser-help analyser-status"
+              required
+            />
+            <button class="analyser-button" id="analyser-submit" type="submit">
+              Analyse
+            </button>
+          </div>
+          <p class="analyser-help" id="analyser-help">
+            Checks the URL text without opening the site. Start the local
+            analyser with <code>python3 -m url_risk_analyser --serve</code> from
+            the <code>analyser/</code> folder. If Google Safe Browsing is
+            configured, submitted URLs are also sent to Google.
+          </p>
+        </form>
+
+        <p class="analyser-status" id="analyser-status" role="status" aria-live="polite"></p>
+        <pre class="analyser-result" id="analyser-result" aria-live="polite" hidden></pre>
+      </section>
+
       <section class="section" aria-labelledby="history-title">
         <div class="section-heading">
           <h2 id="history-title">Recent security history</h2>

@@ -18,10 +18,10 @@ No build step, no `npm install`, no external services are required for the core 
 
 - `manifest.json` registers a static rule list (`rules.json`) via `declarative_net_request`. These rules block 15 pre-configured fake phishing domains (all on reserved `.test` / `.invalid` TLDs — see `docs/test-domains.md`) by redirecting navigation to `blocked/blocked.html` before the page loads.
 - `background.js` is the service worker: it applies the saved protection ON/OFF setting, switches the toolbar icon between its on and off states, and schedules dynamic threat-feed refreshes.
-- `popup/` is the toolbar dashboard. It shows protection state and controls, the active tab hostname, feed status, and recent blocked-site history. The popup does not run URL analysis.
+- `popup/` is the toolbar dashboard. It shows protection state and controls, the active tab hostname, feed status, recent blocked-site history, and a manual URL analyser connected to the local analyser service.
 - `blocked/` is the warning page shown when a site is blocked. Static and dynamic rules pass the blocked address and a source or demo-pattern reason to it, and it records blocked-site events through `shared/storage.js`.
 - `shared/storage.js` is a small wrapper around `chrome.storage.local` for settings and the 50 most recent blocked-site events.
-- `analyser/` is a Python package (`url_risk_analyser`) that analyses pasted URLs. Its local API is called by the warning page's **Analyse this URL** control; start it with `python -m url_risk_analyser --serve` from `analyser/`.
+- `analyser/` is a Python package (`url_risk_analyser`) that analyses submitted URL text. Its local API is called by **Analyse this URL** on the warning page and the popup's **Analyse** control; start it with `python -m url_risk_analyser --serve` from `analyser/`.
 
 ## Running the test-domain checks
 
@@ -53,7 +53,7 @@ url-risk --json <url>            # machine-readable output
 url-risk --serve                 # local API on http://127.0.0.1:8765 for the warning-page analyser
 ```
 
-Requires Python 3.10+, standard library only. Start the API before using **Analyse this URL** on the warning page. See `analyser/README.md` for verdict categories and heuristic checks.
+Requires Python 3.10+, standard library only. Start the API before using the analyser in the warning page or popup. The analyser checks URL text and does not visit the destination. See `analyser/README.md` for verdict categories and heuristic checks.
 
 ## What's implemented vs. not yet
 
@@ -62,7 +62,7 @@ Requires Python 3.10+, standard library only. Start the API before using **Analy
 | F01 — Automatic website blocking | **Working.** 15 static test-domain rules block and redirect before page load.                                                                                                                                                              |
 | F02 — Security warning page      | **Working.** Static and dynamic rules pass the blocked address and a source or demo-pattern reason to the warning page. The page includes a temporary, user-confirmed **Proceed anyway** option that allows the host for about 10 minutes. |
 | F03 — Protection popup/dashboard | **Working.** The popup shows protection state with an ON/OFF toggle, the active tab hostname, feed status, and stored event counts.                                                                                                        |
-| F04 — Manual URL risk analyser   | **Partially integrated.** The warning page lets users enter a URL and view the local analyser report. The popup has no analyser UI.                                                                                                        |
+| F04 — Manual URL risk analyser   | **Working.** The warning page and popup let users submit a URL to the local analyser and view threat-intelligence and heuristic results. The local service must be running. |
 | F05 — Security history           | **Working.** The warning page records events locally, and the popup displays up to five recent events from the 50-entry local history, including the recorded reason and time.                                                             |
 
 Current manual QA steps are documented in [test-domains.md](docs/test-domains.md), [test-cases.md](docs/test-cases.md), and [demo-script.md](docs/demo-script.md).
