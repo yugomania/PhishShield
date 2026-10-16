@@ -1,4 +1,6 @@
 const HISTORY_LIMIT = 5;
+const ANALYSER_API_URL = "http://127.0.0.1:8765/analyse";
+const ANALYSER_TIMEOUT_MS = 15_000;
 
 const popupState = {
   settings: { protectionEnabled: true },
@@ -27,6 +29,143 @@ function formatTimestamp(value, fallback = "—") {
     hour: "numeric",
     minute: "2-digit",
   }).format(date);
+}
+
+function normalizeAnalyserUrl(value) {
+  if (typeof value !== "string" || !value.trim()) return null;
+
+  try {
+    const url = new URL(value.trim());
+    if (
+      (url.protocol !== "http:" && url.protocol !== "https:") ||
+      url.username ||
+      url.password
+    ) {
+      return null;
+    }
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function formatAnalysisReport(report) {
+  const verdict = report?.verdict || {};
+  const intel = report?.threat_intelligence || {};
+  const heuristics = report?.heuristics || {};
+  const matches = Array.isArray(intel.matches) ? intel.matches : [];
+  const findings = Array.isArray(heuristics.findings) ? heuristics.findings : [];
+  const lines = [
+    `Verdict: ${verdict.label || "Result unavailable"}`,
+    verdict.summary || "The analyser did not provide a verdict summary.",
+    "",
+    `Threat intelligence: ${matches.length
+      ? matches.map((match) => {
+          const details = [match.source, match.detail, match.matched]
+            .filter((value) => typeof value === "string" && value)
+            .join(" — ");
+          return details || "Threat-intelligence match";
+        }).join("\n")
+      : "No threat-intelligence match."}`,
+  ];
+
+  if (typeof intel.meaning === "string" && intel.meaning) {
+    lines.push(intel.meaning);
+  }
+
+  lines.push(
+    "",
+    `Heuristic risk: ${Number.isFinite(heuristics.risk_score) ? heuristics.risk_score : "—"}/100 (${heuristics.risk_level || "unknown"})`,
+  );
+
+  if (findings.length) {
+    lines.push(
+      "",
+      ...findings.map((finding) =>
+        `• ${finding.title || "Finding"}: ${finding.explanation || "Details unavailable."}`,
+      ),
+    );
+  } else {
+    lines.push("No heuristic warning signs were found.");
+  }
+
+  if (typeof heuristics.disclaimer === "string" && heuristics.disclaimer) {
+    lines.push("", heuristics.disclaimer);
+  }
+  if (Array.isArray(intel.errors) && intel.errors.length) {
+    lines.push("", `Source errors: ${intel.errors.join("; ")}`);
+  }
+  if (Array.isArray(report?.notes) && report.notes.length) {
+    lines.push("", ...report.notes);
+  }
+
+  return lines.join("\n");
+}
+
+function setAnalyserStatus(message, state = "") {
+  const status = byId("analyser-status");
+  if (!status) return;
+  status.textContent = message;
+  status.classList.remove("is-error", "is-success");
+  if (state) status.classList.add(`is-${state}`);
+}
+
+async function analyseUrlFromPopup(event) {
+  event.preventDefault();
+  const input = byId("analyser-url");
+  const button = byId("analyser-submit");
+  const result = byId("analyser-result");
+  const url = normalizeAnalyserUrl(input.value);
+
+  if (!url) {
+    result.hidden = true;
+    setAnalyserStatus("Enter a valid HTTP or HTTPS URL without a username or password.", "error");
+    input.focus();
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Analysing…";
+  result.hidden = true;
+  result.textContent = "";
+  setAnalyserStatus("Checking the URL text with the local analyser…");
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), ANALYSER_TIMEOUT_MS);
+  try {
+    const response = await fetch(ANALYSER_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+      signal: controller.signal,
+    });
+
+    let report;
+    try {
+      report = await response.json();
+    } catch {
+      throw new Error(`The analyser returned an unreadable response (HTTP ${response.status}).`);
+    }
+    if (!response.ok) {
+      throw new Error(report?.error || `Analysis failed (HTTP ${response.status}).`);
+    }
+
+    result.textContent = formatAnalysisReport(report);
+    result.hidden = false;
+    setAnalyserStatus("Analysis complete. Results are indicators, not a guarantee of safety.", "success");
+  } catch (error) {
+    const detail = error.name === "AbortError"
+      ? "The analyser took too long to respond."
+      : error.message;
+    setAnalyserStatus(
+      `Could not reach or use the local analyser. Make sure it is running, then try again. ${detail}`,
+      "error",
+    );
+  } finally {
+    clearTimeout(timeoutId);
+    button.disabled = false;
+    button.textContent = "Analyse";
+  }
 }
 
 function renderProtection() {
@@ -138,7 +277,9 @@ function renderCurrentSite() {
   setText("current-site", hostname || "Open a tab to see site status");
   setText("current-site-detail", hostname ? "Hostname of the active tab" : "No web address is available for this tab.");
   if (badge) {
-    badge.textContent = popupState.settings.protectionEnabled === false ? "RULES OFF" : "RULES ON";
+    badge.textContent = popupState.settings.protectionEnabled === false
+      ? "Protection paused"
+      : "Protection active";
     badge.classList.toggle("is-disabled", popupState.settings.protectionEnabled === false);
   }
 }
@@ -162,11 +303,16 @@ async function loadActiveTab() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     popupState.activeTabUrl = typeof tab?.url === "string" ? tab.url : "";
+    const input = byId("analyser-url");
+    const tabUrl = normalizeAnalyserUrl(popupState.activeTabUrl);
+    if (input && tabUrl && !input.value.trim()) input.value = tabUrl;
   } catch (error) {
     console.warn("PhishShield: could not read active tab", error);
     popupState.activeTabUrl = "";
   }
 }
+
+byId("analyser-form")?.addEventListener("submit", analyseUrlFromPopup);
 
 async function loadPopupData() {
   const [settings, history, stored] = await Promise.all([

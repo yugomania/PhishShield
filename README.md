@@ -2,7 +2,7 @@
 
 A Chrome extension (Manifest V3) that adds an extra protection layer against phishing websites. It blocks known/configured phishing destinations using Chrome's `declarativeNetRequest` rules, shows a clear warning page when something is blocked, and reports its own status through a popup.
 
-**Status:** Hackathon MVP in progress (12–16 Oct 2026). This README reflects what is actually implemented as of 15 Oct — see [What's implemented vs. not yet](#whats-implemented-vs-not-yet) below.
+**Status:** Hackathon MVP in progress (12–16 Oct 2026). This README reflects what is implemented as of 16 Oct — see [What's implemented vs. not yet](#whats-implemented-vs-not-yet) below.
 
 ## Install (load unpacked)
 
@@ -10,18 +10,18 @@ A Chrome extension (Manifest V3) that adds an extra protection layer against phi
 2. Turn on **Developer mode** (top-right toggle).
 3. Click **Load unpacked** and select the `PhishShield/` project folder (the one containing `manifest.json`).
 4. Confirm the extension appears with **no errors** shown beneath its card.
-5. Click the PhishShield icon in the toolbar — the badge should read **ON** (green) once installed.
+5. Click the PhishShield icon in the toolbar. The popup should show **Protection: ON**, and the toolbar icon should show the active shield.
 
 No build step, no `npm install`, no external services are required for the core blocking feature to work.
 
 ## How it works
 
 - `manifest.json` registers a static rule list (`rules.json`) via `declarative_net_request`. These rules block 15 pre-configured fake phishing domains (all on reserved `.test` / `.invalid` TLDs — see `docs/test-domains.md`) by redirecting navigation to `blocked/blocked.html` before the page loads.
-- `background.js` is the service worker: it applies the saved protection ON/OFF setting, sets the toolbar badge, and schedules dynamic threat-feed refreshes.
-- `popup/` is the toolbar dashboard. It shows protection state and controls, the active tab hostname, feed status, and recent blocked-site history. The popup does not run URL analysis.
+- `background.js` is the service worker: it applies the saved protection ON/OFF setting, switches the toolbar icon between its on and off states, and schedules dynamic threat-feed refreshes.
+- `popup/` is the toolbar dashboard. It shows protection state and controls, the active tab hostname, feed status, recent blocked-site history, and a manual URL analyser connected to the local analyser service.
 - `blocked/` is the warning page shown when a site is blocked. Static and dynamic rules pass the blocked address and a source or demo-pattern reason to it, and it records blocked-site events through `shared/storage.js`.
 - `shared/storage.js` is a small wrapper around `chrome.storage.local` for settings and the 50 most recent blocked-site events.
-- `analyser/` is a Python package (`url_risk_analyser`) that analyses pasted URLs. Its local API is called by the warning page's **Analyse this URL** control; start it with `python -m url_risk_analyser --serve` from `analyser/`.
+- `analyser/` is a Python package (`url_risk_analyser`) that analyses submitted URL text. Its local API is called by **Analyse this URL** on the warning page and the popup's **Analyse** control; start it with `python -m url_risk_analyser --serve` from `analyser/`.
 
 ## Running the test-domain checks
 
@@ -33,6 +33,7 @@ node scripts/feed.test.cjs
 ```
 
 The validator checks `rules.json` with no external dependencies — plain Node.js. It checks that every rule:
+
 - has a unique `id` and `urlFilter`,
 - redirects to `/blocked/blocked.html` with a `site` query parameter matching the blocked domain,
 - targets `main_frame` only,
@@ -52,19 +53,46 @@ url-risk --json <url>            # machine-readable output
 url-risk --serve                 # local API on http://127.0.0.1:8765 for the warning-page analyser
 ```
 
-Requires Python 3.10+, standard library only. Start the API before using **Analyse this URL** on the warning page. See `analyser/README.md` for verdict categories and heuristic checks.
+Requires Python 3.10+, standard library only. Start the API before using the analyser in the warning page or popup. The analyser checks URL text and does not visit the destination. See `analyser/README.md` for verdict categories and heuristic checks.
 
 ## What's implemented vs. not yet
 
-| PRD feature | Status |
-| --- | --- |
-| F01 — Automatic website blocking | **Working.** 15 static test-domain rules block and redirect before page load. |
-| F02 — Security warning page | **Working.** Static and dynamic rules pass the blocked address and a source or demo-pattern reason to the warning page. |
-| F03 — Protection popup/dashboard | **Working.** The popup shows protection state with an ON/OFF toggle, the active tab hostname, feed status, and stored event counts. |
-| F04 — Manual URL risk analyser | **Partially integrated.** The warning page lets users enter a URL and view the local analyser report. The popup has no analyser UI. |
-| F05 — Security history | **Working.** The warning page records events locally, and the popup displays up to five recent events from the 50-entry local history, including the recorded reason and time. |
+| PRD feature                      | Status                                                                                                                                                                                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F01 — Automatic website blocking | **Working.** 15 static test-domain rules block and redirect before page load.                                                                                                                                                              |
+| F02 — Security warning page      | **Working.** Static and dynamic rules pass the blocked address and a source or demo-pattern reason to the warning page. The page includes a temporary, user-confirmed **Proceed anyway** option that allows the host for about 10 minutes. |
+| F03 — Protection popup/dashboard | **Working.** The popup shows protection state with an ON/OFF toggle, the active tab hostname, feed status, and stored event counts.                                                                                                        |
+| F04 — Manual URL risk analyser   | **Working.** The warning page and popup let users submit a URL to the local analyser and view threat-intelligence and heuristic results. The local service must be running. |
+| F05 — Security history           | **Working.** The warning page records events locally, and the popup displays up to five recent events from the 50-entry local history, including the recorded reason and time.                                                             |
 
 Current manual QA steps are documented in [test-domains.md](docs/test-domains.md), [test-cases.md](docs/test-cases.md), and [demo-script.md](docs/demo-script.md).
+
+## Data sources
+
+| Source                                             | What it provides                                            | Refresh                | Notes                                                                                   |
+| -------------------------------------------------- | ----------------------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------- |
+| Static demo rules (`rules.json`)                   | 15 reserved `.test` and `.invalid` domains                  | Fixed in the extension | Safe for demos. These are not real threats.                                             |
+| [OpenPhish community feed](https://openphish.com/) | URLs of reported phishing pages                             | Every 12 hours         | Free community feed intended for non-commercial use. Check OpenPhish for current terms. |
+| [CERT Polska domain list](https://cert.pl/)        | Domains reported as malicious, aimed mainly at Polish users | Every 60 minutes       | Reuse terms have not been confirmed. Check CERT Polska before using beyond this demo.   |
+
+**How the feeds are used.** The service worker downloads each feed and converts
+the entries into up to 4,000 dynamic Chrome rules, with OpenPhish entries first.
+Matching happens locally in Chrome, so browsing activity is not sent to a
+PhishShield server. If a download fails, the previous rules stay in place.
+
+**What this cannot do.** PhishShield only blocks sites that have already been
+reported. A new phishing site may not be caught, and coverage depends on what
+the feeds contain. The CERT list focuses on Polish users, so it may be less
+relevant for other regions.
+
+**The analyser uses separate data.** The local analyser has its own demo list
+and optional threat data, separate from the extension feeds. A site blocked by
+a live feed may therefore show no list match in the analyser. If a Google Safe
+Browsing key is configured, submitted analysis URLs are sent to Google.
+
+**Testing safety.** Never open URLs taken from the live feeds; they can be
+active phishing sites. Test blocking with the reserved `.test` and `.invalid`
+demo domains.
 
 ## Known limitations
 
@@ -77,7 +105,7 @@ Current manual QA steps are documented in [test-domains.md](docs/test-domains.md
 ```
 PhishShield/
 ├── manifest.json              Extension manifest (MV3)
-├── background.js              Service worker: protection state, badge, feed refresh
+├── background.js              Service worker: protection state, toolbar icon, feed refresh
 ├── rules.json                 Static declarativeNetRequest rules (15 demo domains)
 ├── blocking/feed.js           Builds dynamic rules from live threat feeds
 ├── shared/storage.js          chrome.storage.local wrapper (settings, events)

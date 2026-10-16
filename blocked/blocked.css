@@ -32,6 +32,17 @@ button {
   font: inherit;
 }
 
+.logo{
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: #15243a;
+  color: #93c5fd;
+  font-size: 20px;
+}
+
 .page {
   width: min(100% - 32px, 760px);
   margin: 0 auto;
@@ -337,6 +348,86 @@ footer strong {
   outline-offset: 2px;
 }
 
+.proceed {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.link-button {
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  color: var(--text);
+}
+
+.proceed-confirm {
+  margin-top: 10px;
+  padding: 16px;
+  border: 1px solid var(--red);
+  border-radius: 12px;
+  background: var(--red-dark);
+}
+
+.proceed-confirm[hidden] {
+  display: none;
+}
+
+.proceed-confirm p {
+  margin: 0 0 12px;
+  font-size: 13px;
+}
+
+.proceed-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.proceed-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--red);
+}
+
+.proceed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.danger-button {
+  min-height: 46px;
+  padding: 11px 18px;
+  border: 1px solid var(--red);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger-button:hover:not(:disabled) {
+  background: var(--red);
+  color: #1f0a0d;
+}
+
+.danger-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 @media (max-width: 480px) {
   .page {
     width: min(100% - 20px, 760px);
@@ -371,6 +462,14 @@ footer strong {
 
   .primary-button,
   .secondary-button {
+    width: 100%;
+  }
+
+  .proceed-actions {
+    flex-direction: column;
+  }
+
+  .danger-button {
     width: 100%;
   }
 }

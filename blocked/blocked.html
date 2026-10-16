@@ -12,7 +12,21 @@
   <body>
     <main class="page">
       <header class="brand">
-        <div class="brand-icon" aria-hidden="true">P</div>
+        <svg viewBox="0 0 24 24" fill="none" class="logo" aria-hidden="true">
+              <path
+                d="M12 3 19 6v5c0 4.5-2.9 8-7 10-4.1-2-7-5.5-7-10V6l7-3Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+              <path
+                d="m9 12 2 2 4-4"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
         <div>
           <h1>PhishShield</h1>
           <p>Browser Protection</p>
@@ -96,6 +110,38 @@
           <button id="close-tab" class="secondary-button" type="button">
             Close this tab
           </button>
+        </div>
+
+        <div class="proceed" id="proceed-section">
+          <button id="proceed-start" class="link-button" type="button">
+            Proceed anyway (not recommended)
+          </button>
+
+          <div id="proceed-confirm" class="proceed-confirm" hidden>
+            <p>
+              <strong>Only continue if you trust this website.</strong>
+              PhishShield will allow it for about 10 minutes, then block it
+              again. Do not enter passwords, payment details, or verification
+              codes.
+            </p>
+            <label class="proceed-check">
+              <input type="checkbox" id="proceed-understand" />
+              I understand the risk
+            </label>
+            <div class="proceed-actions">
+              <button
+                id="proceed-confirm-button"
+                class="danger-button"
+                type="button"
+                disabled
+              >
+                Continue to website
+              </button>
+              <button id="proceed-cancel" class="secondary-button" type="button">
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
 
         <p class="safety-note">
