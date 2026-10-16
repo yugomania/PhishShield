@@ -183,6 +183,158 @@ document.addEventListener("DOMContentLoaded", () => {
     showNotice("If the tab remains open, close it using your browser controls.");
   });
 
+  // ---------- Proceed anyway ----------
+  const ALLOW_MINUTES = 10;
+  const proceedSection = document.getElementById("proceed-section");
+  const proceedStart = document.getElementById("proceed-start");
+  const proceedConfirm = document.getElementById("proceed-confirm");
+  const proceedCheckbox = document.getElementById("proceed-understand");
+  const proceedConfirmButton = document.getElementById("proceed-confirm-button");
+  const proceedCancel = document.getElementById("proceed-cancel");
+  let proceedBusy = false;
+
+  // Hide the exception control when this page is embedded by another site.
+  if (window.top !== window.self) {
+    proceedSection.hidden = true;
+  }
+
+  function getProceedTarget() {
+    const params = new URLSearchParams(window.location.search);
+    const site = params.get("site");
+    const originalUrl =
+      params.get("url") || params.get("blockedUrl") || params.get("blocked_url");
+    const safeUrl = getSafeUrl(originalUrl || (site ? `https://${site}/` : ""));
+    if (!safeUrl) return null;
+
+    const parsed = new URL(safeUrl);
+    if (parsed.username || parsed.password) return null;
+
+    const host = parsed.hostname.toLowerCase();
+    const labels = host.split(".");
+    if (
+      host.length > 253 ||
+      !/^[a-z0-9.-]+$/i.test(host) ||
+      labels.some(
+        (label) =>
+          !label ||
+          label.length > 63 ||
+          !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(label),
+      )
+    ) {
+      return null;
+    }
+
+    return { host, url: parsed.href };
+  }
+
+  async function allowHostTemporarily(host) {
+    const filter = `||${host}^`;
+    const existing = await chrome.declarativeNetRequest.getSessionRules();
+    const sameRule = existing.find(
+      (rule) => rule.condition?.urlFilter === filter && rule.action?.type === "allow",
+    );
+    const id = sameRule
+      ? sameRule.id
+      : Math.max(0, ...existing.map((rule) => rule.id)) + 1;
+    const alarmName = `allow-expiry-${id}`;
+    const { allowed: storedAllows = {} } = await chrome.storage.local.get("allowed");
+    const allowed =
+      storedAllows && typeof storedAllows === "object" && !Array.isArray(storedAllows)
+        ? { ...storedAllows }
+        : {};
+    const previousRecord = allowed[id];
+    allowed[id] = {
+      host,
+      expiresAt: Date.now() + ALLOW_MINUTES * 60 * 1000,
+    };
+
+    try {
+      // Save the deadline and alarm before adding the exception, so an alarm
+      // failure cannot leave an unbounded allow rule behind.
+      await chrome.storage.local.set({ allowed });
+      await chrome.alarms.create(alarmName, { delayInMinutes: ALLOW_MINUTES });
+      await chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [id],
+        addRules: [
+          {
+            id,
+            priority: 10,
+            action: { type: "allow" },
+            condition: {
+              urlFilter: filter,
+              resourceTypes: ["main_frame"],
+            },
+          },
+        ],
+      });
+    } catch (error) {
+      if (previousRecord) allowed[id] = previousRecord;
+      else delete allowed[id];
+      await chrome.storage.local.set({ allowed }).catch(() => {});
+      if (previousRecord?.expiresAt > Date.now()) {
+        await chrome.alarms
+          .create(alarmName, {
+            delayInMinutes: Math.max(
+              0.5,
+              (previousRecord.expiresAt - Date.now()) / 60_000,
+            ),
+          })
+          .catch(() => {});
+      } else {
+        await chrome.alarms.clear(alarmName).catch(() => {});
+      }
+      throw error;
+    }
+  }
+
+  function resetProceedUi() {
+    proceedConfirm.hidden = true;
+    proceedStart.hidden = false;
+    proceedCheckbox.checked = false;
+    proceedCheckbox.disabled = false;
+    proceedCancel.disabled = false;
+    proceedConfirmButton.disabled = true;
+    proceedBusy = false;
+  }
+
+  proceedStart.addEventListener("click", () => {
+    proceedStart.hidden = true;
+    proceedConfirm.hidden = false;
+    proceedCheckbox.focus();
+  });
+
+  proceedCheckbox.addEventListener("change", () => {
+    proceedConfirmButton.disabled = !proceedCheckbox.checked || proceedBusy;
+  });
+
+  proceedCancel.addEventListener("click", resetProceedUi);
+
+  proceedConfirmButton.addEventListener("click", async () => {
+    if (!proceedCheckbox.checked || proceedBusy) return;
+
+    const target = getProceedTarget();
+    if (!target) {
+      showNotice("No valid website address is available, so this site cannot be allowed.");
+      return;
+    }
+
+    proceedBusy = true;
+    proceedConfirmButton.disabled = true;
+    proceedCheckbox.disabled = true;
+    proceedCancel.disabled = true;
+    try {
+      await allowHostTemporarily(target.host);
+      window.location.replace(target.url);
+    } catch (err) {
+      console.error("PhishShield: could not allow site", err);
+      showNotice("Could not allow this site. Please try again.");
+      proceedBusy = false;
+      proceedCheckbox.disabled = false;
+      proceedCancel.disabled = false;
+      proceedConfirmButton.disabled = !proceedCheckbox.checked;
+    }
+  });
+
   loadBlockDetails();
 
   function formatAnalysisReport(report) {

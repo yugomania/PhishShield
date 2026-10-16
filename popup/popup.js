@@ -138,7 +138,9 @@ function renderCurrentSite() {
   setText("current-site", hostname || "Open a tab to see site status");
   setText("current-site-detail", hostname ? "Hostname of the active tab" : "No web address is available for this tab.");
   if (badge) {
-    badge.textContent = popupState.settings.protectionEnabled === false ? "RULES OFF" : "RULES ON";
+    badge.textContent = popupState.settings.protectionEnabled === false
+      ? "Protection paused"
+      : "Protection active";
     badge.classList.toggle("is-disabled", popupState.settings.protectionEnabled === false);
   }
 }

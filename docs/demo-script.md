@@ -24,7 +24,11 @@
    confirmed live threat.
 4. Replace it with `https://www.wikipedia.org/` and analyse it to demonstrate
    that the field accepts a URL other than the blocked address.
-5. If the local service is stopped, the page reports that it cannot reach the
+5. Select **Proceed anyway**, tick **I understand the risk**, then select
+   **Continue to website**. Explain that the reserved `.test` domain will show
+   Chrome's “This site can’t be reached” message because it does not exist; the
+   temporary allow rule lifts PhishShield's block for about 10 minutes.
+6. If the local service is stopped, the page reports that it cannot reach the
    analyser. Restart the service to restore analysis.
 
 The analyser evaluates the submitted URL text. It does not visit the URL or

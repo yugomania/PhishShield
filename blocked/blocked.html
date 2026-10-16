@@ -98,6 +98,38 @@
           </button>
         </div>
 
+        <div class="proceed" id="proceed-section">
+          <button id="proceed-start" class="link-button" type="button">
+            Proceed anyway (not recommended)
+          </button>
+
+          <div id="proceed-confirm" class="proceed-confirm" hidden>
+            <p>
+              <strong>Only continue if you trust this website.</strong>
+              PhishShield will allow it for about 10 minutes, then block it
+              again. Do not enter passwords, payment details, or verification
+              codes.
+            </p>
+            <label class="proceed-check">
+              <input type="checkbox" id="proceed-understand" />
+              I understand the risk
+            </label>
+            <div class="proceed-actions">
+              <button
+                id="proceed-confirm-button"
+                class="danger-button"
+                type="button"
+                disabled
+              >
+                Continue to website
+              </button>
+              <button id="proceed-cancel" class="secondary-button" type="button">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+
         <p class="safety-note">
           Do not enter passwords, payment details, or verification codes on a
           website you suspect is malicious.
